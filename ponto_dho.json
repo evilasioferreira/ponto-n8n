@@ -1,0 +1,1369 @@
+{
+  "name": "ponto_dho",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "weekday": "3"
+            },
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "weekday": "4"
+            },
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "weekday": "5"
+            },
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "weekday": "6"
+            },
+            {
+              "mode": "everyWeek",
+              "hour": 9,
+              "weekday": "0"
+            }
+          ]
+        }
+      },
+      "id": "f8034a8d-e7ef-41e5-ad51-c76d91661e1a",
+      "name": "Start - Agendamento",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        -780
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Queremos utilizar o N8N para automatizar disparos de informações sobre omissões de registro, saldos de horas extras e intervalos intra e interjornada. O objetivo é que os gestores recebam essas informações diariamente, facilitando a gestão do ponto e a tomada de decisões.\nVocê acha que é possivel fazer essas automações?\n \nHoje preciso mandar para o colaborador que ele não fez o registro e isso tem custado tempo , pois hoje somos 72 que registram ponto.\n\n  - Solicitado por Meire",
+        "height": 220,
+        "width": 560
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1760,
+        -1480
+      ],
+      "typeVersion": 1,
+      "id": "b7c226b2-ebce-41ec-92d8-81f8d6ee5e20",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": " - Registro faltando? Condição verdadeira.",
+        "height": 220,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -1080
+      ],
+      "typeVersion": 1,
+      "id": "93184f15-9520-4b74-881b-926061c3622e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "https://api.tangerino.com.br/api/punch/daily-activity",
+        "options": {},
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Authorization",
+              "value": "Basic NmIyYjA2MWQyYWJkNDI2NmIxMzVhZWFlNjE4ZTNlNGE6NTMyYWYxMjljYjg5NGRiYjgwZjVlNmI3YTAwMmNmMjk="
+            }
+          ]
+        },
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "startDate",
+              "value": "={{ (new Date(new Date().setDate(new Date().getDate() - 1))).setHours(0, 0, 0, 0) }}\n\n"
+            },
+            {
+              "name": "endDate",
+              "value": "={{ (new Date(new Date().setDate(new Date().getDate() - 1))).setHours(23, 59, 59, 999) }}\n"
+            },
+            {
+              "name": "punchList",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "id": "2659ba64-8122-4678-8b2a-b6a20bdcda12",
+      "name": "API Tangerino",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        -780
+      ],
+      "notesInFlow": true,
+      "notes": "Dados do dia-2"
+    },
+    {
+      "parameters": {
+        "content": " - Mais de 8h trab, implica H.E, condição verdadeira.",
+        "height": 220,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -780
+      ],
+      "typeVersion": 1,
+      "id": "4fbe0e82-23df-4a4a-945d-bb35fc19fd8a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Pendente\n - Intervalos interjornada\n - Envio para gestor (Resumo da área)\n - Credenciais Teams (+1 opção de disparo)",
+        "width": 560,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1760,
+        -1240
+      ],
+      "typeVersion": 1,
+      "id": "6ba35f2e-4d35-4620-a729-bd43ed267ca8",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": " - Se Intervalo < 60min, cond verdadeira.",
+        "height": 220,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "05e36d4c-f7fc-4142-bb1a-99f298853215",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "235201a3-77ee-48cd-9f10-bc3746294ec6",
+              "leftValue": "={{ $json.intervalo_almoco }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        -420
+      ],
+      "id": "9e4a9792-9bd7-419a-bfa5-0b13931069d5",
+      "name": "Intrajornada",
+      "notesInFlow": false,
+      "notes": "Intrajornada"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2b470330-18e8-4839-9bf5-58ff7e55f24a",
+              "leftValue": "={{ $json.total_min_trab }}",
+              "rightValue": 480,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        20,
+        -720
+      ],
+      "id": "104b43ff-0f03-4467-a0f7-33727e0062ff",
+      "name": "HoraExtra",
+      "notesInFlow": false,
+      "notes": "Hora extra"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f31f012-66f1-4511-9bd8-7b6ab806db09",
+              "leftValue": "={{ $json.ponto.entrada }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2b470330-18e8-4839-9bf5-58ff7e55f24a",
+              "leftValue": "={{ $json.ponto.almoco }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8d62c40d-2c03-4d67-ad72-4ac9a932f3cd",
+              "leftValue": "={{ $json.ponto.retorno }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a7abb692-0ceb-42f1-a679-728e576fc8c6",
+              "leftValue": "={{ $json.ponto.saida }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        -1020
+      ],
+      "id": "e9033c7e-1fa4-483d-980f-e10407c31e12",
+      "name": "Omissão",
+      "notesInFlow": false,
+      "notes": "Omissão?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f31f012-66f1-4511-9bd8-7b6ab806db09",
+              "leftValue": "={{ $json.ponto.entrada }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2b470330-18e8-4839-9bf5-58ff7e55f24a",
+              "leftValue": "={{ $json.ponto.saida }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        -1340
+      ],
+      "id": "cf54d053-62a0-4a36-9706-7b87be56193c",
+      "name": "Omissão1",
+      "notesInFlow": false,
+      "notes": "Omissão?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "21b00f51-8452-4ff3-a6db-4a9da44894d8",
+              "leftValue": "={{ $json.nome }}",
+              "rightValue": "FRANCISCO EVILÁSIO FERREIRA DA SILVA FILHO",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "48ba8db2-9108-40e5-99de-f90637978d01",
+              "leftValue": "={{ $json.nome }}",
+              "rightValue": "JOÃO LUIZ DA SILVA NETO",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "9c6c61c6-c98b-40ae-9c80-1fe661138fa3",
+              "leftValue": "={{ $json.nome }}",
+              "rightValue": "DAVI REZENDE PEREIRA",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -400,
+        -780
+      ],
+      "id": "eac2c6fa-1648-4c28-8d3d-401415bc56e7",
+      "name": "Plantonistas"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = [];\nconst totalItems = $json.length; // Número total de itens\n\n// Limitar a quantidade de itens a 100, caso existam mais que 100\nconst limit = totalItems > 100 ? 100 : totalItems;\n\nfor (let i = 0; i < limit; i++) {\n  const nome = $json[i]?.name || null;\n\n  // Filtrar apenas os nomes desejados\n  if (nome !== \"FRANCISCO EVILÁSIO FERREIRA DA SILVA FILHO\" && nome !== \"JOÃO LUIZ DA SILVA NETO\") {\n    continue; // Pula para o próximo item do loop\n  }\n\n  const entrada = $json[i]?.punchs[0]?.records[0]?.startDate || null;\n  const saida = $json[i]?.punchs[0]?.records[0]?.endDate || null;\n\n  // Referência para o total de horas trabalhadas\n  const totalWorkedHours = $json[i]?.punchs[0]?.totalWorkedHours || null;\n\n  let horasExtras = null;\n  let totalMinutosTrab = null;\n  if (totalWorkedHours) {\n    // Convertendo as horas trabalhadas para minutos\n    const [horas, minutos] = totalWorkedHours.split(':').map(Number);\n    totalMinutosTrab = horas * 60 + minutos;\n\n    // Se o total de horas for maior que 12 horas (720 minutos), calcular as horas extras\n    const limiteHoras = 12 * 60; // 12 horas em minutos\n    if (totalMinutosTrab > limiteHoras) {\n      // Calculando o total de minutos extras\n      const minutosExtras = totalMinutosTrab - limiteHoras;\n      const horasExtrasCalculadas = Math.floor(minutosExtras / 60);\n      const minutosExtrasRestantes = minutosExtras % 60;\n\n      // Formatar o valor de horas extras no formato \"hh:mm\"\n      horasExtras = `${horasExtrasCalculadas}h ${minutosExtrasRestantes}m`;\n    }\n  }\n\n  // Formatar o total de horas trabalhadas em \"hh:mm\"\n  const horasFormatadas = `${Math.floor(totalMinutosTrab / 60)}h ${totalMinutosTrab % 60}m`;\n\n  const item = {\n    nome: nome,\n    email: $json[i]?.email || null,\n    ponto: {\n      entrada: entrada,\n      saida: saida\n    },\n    total_min_trab: totalMinutosTrab, // Total de horas trabalhadas em minutos\n    total_horas_trab: horasFormatadas, // Total de horas trabalhadas formatado em \"hh:mm\"\n    horas_extras: horasExtras // Exibindo o cálculo de horas extras\n  };\n\n  // Adiciona o item ao array de dados\n  data.push({ json: item });\n}\n\n// Retorne os dados somente se houver itens a serem criados\nreturn data;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        -1340
+      ],
+      "id": "2a60351c-51ea-44d3-a88e-6a1a2f37f61a",
+      "name": "Tratamento de dados",
+      "notesInFlow": true,
+      "notes": "Base 12x36"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = [];\nconst totalItems = $json.length;\n\n// Supondo que os dados da planilha estão vindo de outro nó, como `$input.item.json`\n// Exemplo: const planilha = $input.item.json; \n// (ajuste conforme o nó correto se vier de outro lugar)\nconst planilha = $input.all().map(item => item.json); \n\nconst limit = totalItems > 100 ? 100 : totalItems;\n\nfor (let i = 0; i < limit; i++) {\n  const funcionario = $json[i];\n  const nomeFuncionario = funcionario?.name || null;\n  const emailFuncionario = funcionario?.email || null;\n\n  const almoco = funcionario?.punchs[0]?.records[0]?.endDate || null;\n  const retorno = funcionario?.punchs[0]?.records[1]?.startDate || null;\n\n  let intervaloAlmoco = null;\n\n  if (almoco && retorno) {\n    const formatDate = (dateStr) => {\n      const [day, month, yearTime] = dateStr.split('/');\n      const [year, time] = yearTime.split(' ');\n      return new Date(`${year}-${month}-${day}T${time}:00`);\n    };\n\n    const almocoDate = formatDate(almoco);\n    const retornoDate = formatDate(retorno);\n\n    if (!isNaN(almocoDate) && !isNaN(retornoDate)) {\n      intervaloAlmoco = (retornoDate - almocoDate) / (1000 * 60); // em minutos\n    }\n  }\n\n  const totalWorkedHours = funcionario?.punchs[0]?.totalWorkedHours || null;\n\n  let horasExtras = null;\n  let totalMinutosTrab = null;\n  if (totalWorkedHours) {\n    const [horas, minutos] = totalWorkedHours.split(':').map(Number);\n    totalMinutosTrab = horas * 60 + minutos;\n\n    const limiteHoras = 8 * 60;\n    if (totalMinutosTrab > limiteHoras) {\n      const minutosExtras = totalMinutosTrab - limiteHoras;\n      const horasExtrasCalculadas = Math.floor(minutosExtras / 60);\n      const minutosExtrasRestantes = minutosExtras % 60;\n      horasExtras = `${horasExtrasCalculadas}h ${minutosExtrasRestantes}m`;\n    }\n  }\n\n  const horasFormatadas = `${Math.floor(totalMinutosTrab / 60)}h ${totalMinutosTrab % 60}m`;\n\n  // 🔍 Buscar o gestor correspondente com base no nome\n  const gestorInfo = planilha.find(p => p.nome?.trim().toLowerCase() === nomeFuncionario?.trim().toLowerCase());\n\n  const item = {\n    nome: nomeFuncionario,\n    email: emailFuncionario,\n    gestor: gestorInfo\n      ? {\n          nome: gestorInfo[\"GESTOR IMEDIATO\"],\n          email: gestorInfo[\"EMAIL\"]\n        }\n      : null,\n    ponto: {\n      entrada: funcionario?.punchs[0]?.records[0]?.startDate || null,\n      almoco: almoco,\n      retorno: retorno,\n      saida: funcionario?.punchs[0]?.records[1]?.endDate || null,\n      inicioHoraExtra: funcionario?.punchs[0]?.records[2]?.startDate || null,\n      fimHoraExtra: funcionario?.punchs[0]?.records[2]?.endDate || null\n    },\n    total_min_trab: totalMinutosTrab,\n    total_horas_trab: horasFormatadas,\n    intervalo_almoco: intervaloAlmoco,\n    horas_extras: horasExtras\n  };\n\n  data.push({ json: item });\n}\n\nreturn data;\n\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        -780
+      ],
+      "id": "ea19b4f1-1df1-4af6-969f-f626de2cf1dd",
+      "name": "Tratamento de dadoss",
+      "notesInFlow": true,
+      "notes": "Base 8h"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9d1a9d9e-aa0a-4469-9564-f790dca9da0a",
+              "leftValue": "={{ $json.total_min_trab }}",
+              "rightValue": 600,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        340,
+        -740
+      ],
+      "id": "5db55e95-3509-45bf-8f7a-8391358c8463",
+      "name": "If",
+      "notesInFlow": true,
+      "notes": "H.E passou das 2h?"
+    },
+    {
+      "parameters": {
+        "url": "https://api.tangerino.com.br/api/punch/daily-activity",
+        "options": {},
+        "headerParametersUi": {
+          "parameter": [
+            {
+              "name": "Authorization",
+              "value": "Basic NmIyYjA2MWQyYWJkNDI2NmIxMzVhZWFlNjE4ZTNlNGE6NTMyYWYxMjljYjg5NGRiYjgwZjVlNmI3YTAwMmNmMjk="
+            }
+          ]
+        },
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "startDate",
+              "value": "={{ (new Date(new Date().setDate(new Date().getDate() - 3))).setHours(18, 50, 0, 0) }}\n\n"
+            },
+            {
+              "name": "endDate",
+              "value": "={{ (new Date(new Date().setDate(new Date().getDate() - 2))).setHours(07, 10, 0, 0) }}\n"
+            },
+            {
+              "name": "punchList",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "id": "26ada065-09f0-4df2-a160-bb88d555f4ed",
+      "name": "API Tangerino1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        -1340
+      ],
+      "notesInFlow": true,
+      "notes": "Dados do dia-3"
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 8
+            }
+          ]
+        }
+      },
+      "id": "d91ee8c4-037a-4949-aa36-01f0b66b56d9",
+      "name": "Start - Plantão",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        -1100,
+        -1340
+      ]
+    },
+    {
+      "parameters": {
+        "content": " - Registro faltando? Condição verdadeira.",
+        "height": 220,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -380,
+        -1400
+      ],
+      "typeVersion": 1,
+      "id": "4c31618e-acd6-4731-853d-df1729705e9c",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Base 12h",
+        "height": 340,
+        "width": 1160,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1180,
+        -1480
+      ],
+      "typeVersion": 1,
+      "id": "a271943f-b7bb-44d8-87df-84150738b087",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Base 8h (SEGaSEX)",
+        "height": 900,
+        "width": 1680,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1180,
+        -1100
+      ],
+      "typeVersion": 1,
+      "id": "f70aabe0-b15c-4774-8a12-fcbd920929f6",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "nome, email, horas_extras, ponto.entrada, gestor.nome, gestor.email",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -740
+      ],
+      "id": "c7438f67-fd88-4d3d-8efb-075981eb11bc",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        620,
+        -740
+      ],
+      "id": "21d7f226-18ef-4141-b081-20f96124b809",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        -740
+      ],
+      "id": "b5ed45a1-706e-49e8-9251-2019162db344",
+      "name": "Wait1",
+      "webhookId": "e836fc0b-bd8e-4440-aab8-63e8434881a6"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "=🕗 Alerta: jornada excedeu o limite diário de horas extras\n",
+        "bodyContent": "=Olá, {{ $json.nome.split(' ').slice(0, 2).join(' ') }}, tudo bem?\n\nNo período de {{ $json[\"ponto.entrada\"].split(' ')[0] }}, foi identificado que sua jornada ultrapassou o limite legal de 2 horas extras diárias, conforme estabelecido pelo Art. 59 da CLT.\n \nSabemos que, em alguns momentos, demandas podem exigir maior dedicação. No entanto, qualquer extensão de jornada deve ser previamente autorizada por sua liderança e ocorrer apenas em situações pontuais.\n \nNa Smartspace, defendemos uma cultura de equilíbrio, onde o descanso, o lazer e a saúde não são negociáveis. O excesso de trabalho sem controle pode trazer sérios prejuízos à sua saúde e à sua qualidade de vida.\n \n⚠️ Realizar horas extras sem autorização prévia do gestor e ultrapassar o limite legal está sujeito à aplicação de medidas disciplinares.\nSe tiver dúvidas ou precisar de suporte para ajustar sua rotina de trabalho, procure sua liderança. \nQueremos garantir que sua experiência aqui seja saudável e sustentável.\n \nCom cuidado,\n[DHO]\nSmartspace – #SyncWithLife\n\n\n",
+        "additionalFields": {
+          "bccRecipients": "evilasio.ferreira@smartspace.us",
+          "ccRecipients": "=meirejane@smartspace.us"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -740
+      ],
+      "id": "65407d06-7204-4f17-9758-2e473070bccd",
+      "name": "Disparo - HE>2h",
+      "webhookId": "2a2cfc73-b01c-44e6-bd73-9379987c0097",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "tOxnveNLaTDfzZ5N",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "nome, email, horas_extras, ponto.entrada, ponto.saida",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -1620
+      ],
+      "id": "adc6658a-593b-46cf-8e8a-3facdfda6cac",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        160,
+        -1620
+      ],
+      "id": "a97d09d9-f155-4976-b275-70659c1d27ab",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        -1620
+      ],
+      "id": "133c5882-1d52-4c85-b1c6-0949a86d19cf",
+      "name": "Wait2",
+      "webhookId": "e836fc0b-bd8e-4440-aab8-63e8434881a6"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "=⚠️ Falta de Registro de Ponto.",
+        "bodyContent": "=Olá {{ $json.nome.split(' ').slice(0, 2).join(' ') }}, não identificamos um dos registros de ponto entre os dias {{ $json[\"ponto.entrada\"].split(' ')[0] }} e {{ DateTime.fromFormat($json[\"ponto.entrada\"].split(' ')[0], 'dd/LL/yyyy').plus({ days: 1 }).toFormat('dd/LL/yyyy') }}. \nFavor verificar e ajustar.\n\nAtt;\nDHO\n\n \n\n",
+        "additionalFields": {
+          "ccRecipients": "meirejane@smartspace.us",
+          "from": "automacao@smartspace.us"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        600,
+        -1620
+      ],
+      "id": "88fa8c24-0024-45b9-9957-e0fbfbfff027",
+      "name": "Disparo_Omissão_Plantao",
+      "webhookId": "2a2cfc73-b01c-44e6-bd73-9379987c0097",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "tOxnveNLaTDfzZ5N",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "nome, email, intervalo_almoco, ponto.entrada, gestor.nome, gestor.email",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -440
+      ],
+      "id": "69fad1ab-4349-41dd-8c9c-be06ae570b9f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        620,
+        -440
+      ],
+      "id": "48026b35-fd4b-4111-ba88-64c7ae499e42",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        -440
+      ],
+      "id": "324bd5a6-5ea6-4816-b62a-30644cf264bf",
+      "name": "Wait",
+      "webhookId": "e836fc0b-bd8e-4440-aab8-63e8434881a6"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "=🚨 Alerta: intervalo de refeição e descanso incompleto",
+        "bodyContent": "=Olá, {{ $json.nome.split(' ').slice(0, 2).join(' ') }}, tudo bem?\n \nNo dia {{ $json[\"ponto.entrada\"].split(' ')[0] }}, identificamos que sua jornada não contou com o intervalo intrajornada obrigatório. De acordo com o Art. 71 da CLT, em jornadas superiores a 6 horas, o colaborador deve realizar uma pausa de no mínimo 1 hora para refeição e descanso.\nEsse tempo é essencial para evitar fadiga, manter o foco e cuidar da sua saúde física e mental.\nNa Smartspace, repudiamos a realização de jornadas contínuas sem pausas. Nosso compromisso é com um ambiente saudável, equilibrado e respeitoso com o seu tempo e bem-estar.\n \n⚠️ O não cumprimento do intervalo poderá resultar na aplicação de medidas disciplinares.\n\nCaso precise de apoio ou orientação, fale com sua liderança imediata.\nConte conosco!\nAtenciosamente,\n[DHO]\nSmartspace – #MaisTempoParaOBem",
+        "additionalFields": {
+          "bccRecipients": "evilasio.ferreira@smartspace.us",
+          "ccRecipients": "=meirejane@smartspace.us"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -440
+      ],
+      "id": "ccf2a4ed-3982-4737-b366-2ba8805fe131",
+      "name": "Disparo - Intrajornada",
+      "webhookId": "2a2cfc73-b01c-44e6-bd73-9379987c0097",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "tOxnveNLaTDfzZ5N",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "nome, email, horas_extras, ponto.entrada, ponto.saida, gestor.nome, gestor.email",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -1060
+      ],
+      "id": "deb84630-d924-4186-a027-73c1502ca060",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        620,
+        -1060
+      ],
+      "id": "74761093-0b8e-4e78-a072-422fb39da052",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        -1060
+      ],
+      "id": "82a3da9e-df25-4334-9cd3-2bccb2785d70",
+      "name": "Wait3",
+      "webhookId": "e836fc0b-bd8e-4440-aab8-63e8434881a6"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $json.email }}",
+        "subject": "=⚠️ Atenção: Registro de ponto não realizado",
+        "bodyContent": "=Olá, {{ $json.nome.split(' ').slice(0, 2).join(' ') }}, tudo bem?\nVerificamos que no dia {{ $json[\"ponto.entrada\"].split(' ')[0] }} não foi realizado um dos registros de seu ponto eletrônico. O controle de jornada é uma responsabilidade individual e fundamental para assegurar a correta apuração de horas trabalhadas e o cumprimento das exigências legais.\nPor isso, reforçamos a importância de atenção constante aos horários de entrada, saída e intervalos. Essa prática contribui diretamente para a transparência e a organização do nosso ambiente de trabalho.\n📌 De acordo com o nosso Manual Interno, são permitidos até 6 esquecimentos por período. A partir desse limite, poderão ser adotadas medidas disciplinares.\n \n \nCaso tenha enfrentado alguma dificuldade técnica ou precise de orientação sobre o processo, nossa equipe está à disposição para te apoiar.\n \nCuidar da sua jornada também é um compromisso com a sua experiência na Smartspace.\n \nCom atenção,\n[DHO]\nSmartspace – #SyncWithLife\n\n \n\n",
+        "additionalFields": {
+          "bccRecipients": "evilasio.ferreira@smartspace.us",
+          "ccRecipients": "=meirejane@smartspace.us",
+          "from": "automacao@smartspace.us"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -1060
+      ],
+      "id": "cff5139f-232c-40cd-9149-25fd572711fb",
+      "name": "Disparo_Omissao",
+      "webhookId": "2a2cfc73-b01c-44e6-bd73-9379987c0097",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "tOxnveNLaTDfzZ5N",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "EX: Hoje é 7, traz inf do dia 5",
+        "height": 260,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        -880
+      ],
+      "typeVersion": 1,
+      "id": "d107af0e-e1c0-4eee-950e-1f6735cd74e5",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "O Start ocorre de quarta a dom.\nTrazendo os pontos de Seg a SEX",
+        "height": 260,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1180,
+        -880
+      ],
+      "typeVersion": 1,
+      "id": "f9fb7f0d-fb0d-46cf-a2e8-4f35de969c8a",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -740,
+        -780
+      ],
+      "id": "653318bc-1a16-4331-916e-e2431a7a0ba9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "## Disparos via email",
+        "height": 980,
+        "width": 920,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        520,
+        -1180
+      ],
+      "typeVersion": 1,
+      "id": "bcf2c22f-7945-410c-8ec9-d79e0ed05825",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 220,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        -580
+      ],
+      "typeVersion": 1,
+      "id": "e88d9147-1449-4f93-ad58-5554dc218245",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "getRows",
+        "workbook": {
+          "__rl": true,
+          "value": "015V25THSJOVAATD75JZFYDQZCD6VVFPDQ",
+          "mode": "list",
+          "cachedResultName": "Colaborador por Setor",
+          "cachedResultUrl": "https://digivoxcombr-my.sharepoint.com/personal/automacao_smartspace_us/_layouts/15/Doc.aspx?sourcedoc=%7B09407549-FD8F-4B4E-81C3-221FAB52BC70%7D&file=Colaborador%20por%20Setor.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1"
+        },
+        "worksheet": {
+          "__rl": true,
+          "value": "{EF287140-42AA-4726-A377-41AD2D43D30F}",
+          "mode": "list",
+          "cachedResultName": "Planilha1",
+          "cachedResultUrl": "https://digivoxcombr-my.sharepoint.com/personal/automacao_smartspace_us/_layouts/15/Doc.aspx?sourcedoc=%7B09407549-FD8F-4B4E-81C3-221FAB52BC70%7D&file=Colaborador%20por%20Setor.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1&activeCell=Planilha1!A1"
+        },
+        "table": {
+          "__rl": true,
+          "value": "{27895F01-0190-4F7E-87DC-1DA4EC9F74E2}",
+          "mode": "list",
+          "cachedResultName": "Tabela1",
+          "cachedResultUrl": "https://digivoxcombr-my.sharepoint.com/personal/automacao_smartspace_us/_layouts/15/Doc.aspx?sourcedoc=%7B09407549-FD8F-4B4E-81C3-221FAB52BC70%7D&file=Colaborador%20por%20Setor.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1&activeCell=Planilha1!A1:C97"
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.microsoftExcel",
+      "typeVersion": 2.1,
+      "position": [
+        -920,
+        -520
+      ],
+      "id": "2ea552a6-65cd-4efe-881c-a0d21aaafbb3",
+      "name": "baseEmails",
+      "credentials": {
+        "microsoftExcelOAuth2Api": {
+          "id": "2eKv79LxZkPzhDjK",
+          "name": "Microsoft Excel account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "41e93800-11ed-48ad-b3a2-9d01385c9579",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -360,
+        -500
+      ],
+      "id": "77eec27b-28a9-42d2-bb7e-bc972e82ec71",
+      "name": "Email?"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start - Agendamento": {
+      "main": [
+        [
+          {
+            "node": "API Tangerino",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "baseEmails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Tangerino": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HoraExtra": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Omissão": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Plantonistas": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Email?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratamento de dados": {
+      "main": [
+        [
+          {
+            "node": "Omissão1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratamento de dadoss": {
+      "main": [
+        [
+          {
+            "node": "Plantonistas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Tangerino1": {
+      "main": [
+        [
+          {
+            "node": "Tratamento de dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start - Plantão": {
+      "main": [
+        [
+          {
+            "node": "API Tangerino1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Omissão1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Intrajornada": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Disparo - HE>2h",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparo - HE>2h": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Disparo_Omissão_Plantao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparo_Omissão_Plantao": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Disparo - Intrajornada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparo - Intrajornada": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Disparo_Omissao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparo_Omissao": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Tratamento de dadoss",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "baseEmails": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Email?": {
+      "main": [
+        [
+          {
+            "node": "Omissão",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HoraExtra",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Intrajornada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6b3ce7a0-fecd-44d2-844e-4550a36ed955",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2347da6e79de1daa2598b7e87f1ce2b9476245ddf9f39f21e023ebd9c0dbcc81"
+  },
+  "id": "4bwSIhuJIJx3Kaft",
+  "tags": [
+    {
+      "createdAt": "2025-02-28T11:11:14.859Z",
+      "updatedAt": "2025-02-28T11:11:14.859Z",
+      "id": "wHoZiBeJkzjm5Jv2",
+      "name": "Smartspace"
+    }
+  ]
+}
